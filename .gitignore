@@ -1,0 +1,22 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Databases and local storage
+data/
+*.sqlite
+
+# IDEs and subagent logs
+.gemini/
+.system_generated/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
