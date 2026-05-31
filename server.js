@@ -121,7 +121,7 @@ app.get('/api/products/:id', (req, res) => {
 // Thêm sản phẩm (Dành cho Admin)
 app.post('/api/products', (req, res) => {
   const {
-    name, brand, price, screen, cpu, ram, rom, battery, camera, image_url, description, promotion,
+    name, brand, price, screen, cpu, ram, rom, battery, camera, image_url, image_url_hover, description, promotion,
     rating_performance, rating_camera, rating_battery, rating_price
   } = req.body;
 
@@ -131,13 +131,13 @@ app.post('/api/products', (req, res) => {
 
   const query = `
     INSERT INTO products (
-      name, brand, price, screen, cpu, ram, rom, battery, camera, image_url, description, promotion,
+      name, brand, price, screen, cpu, ram, rom, battery, camera, image_url, image_url_hover, description, promotion,
       rating_performance, rating_camera, rating_battery, rating_price
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.run(query, [
-    name, brand, Number(price), screen, cpu, ram, rom, battery, camera, image_url, description, promotion,
+    name, brand, Number(price), screen, cpu, ram, rom, battery, camera, image_url, image_url_hover, description, promotion,
     Number(rating_performance || 5), Number(rating_camera || 5), Number(rating_battery || 5), Number(rating_price || 5)
   ], function (err) {
     if (err) {
@@ -150,20 +150,20 @@ app.post('/api/products', (req, res) => {
 // Cập nhật sản phẩm (Dành cho Admin)
 app.put('/api/products/:id', (req, res) => {
   const {
-    name, brand, price, screen, cpu, ram, rom, battery, camera, image_url, description, promotion,
+    name, brand, price, screen, cpu, ram, rom, battery, camera, image_url, image_url_hover, description, promotion,
     rating_performance, rating_camera, rating_battery, rating_price
   } = req.body;
 
   const query = `
     UPDATE products SET
       name = ?, brand = ?, price = ?, screen = ?, cpu = ?, ram = ?, rom = ?, battery = ?, camera = ?, 
-      image_url = ?, description = ?, promotion = ?, rating_performance = ?, rating_camera = ?, 
+      image_url = ?, image_url_hover = ?, description = ?, promotion = ?, rating_performance = ?, rating_camera = ?, 
       rating_battery = ?, rating_price = ?
     WHERE id = ?
   `;
 
   db.run(query, [
-    name, brand, Number(price), screen, cpu, ram, rom, battery, camera, image_url, description, promotion,
+    name, brand, Number(price), screen, cpu, ram, rom, battery, camera, image_url, image_url_hover, description, promotion,
     Number(rating_performance), Number(rating_camera), Number(rating_battery), Number(rating_price), req.params.id
   ], function (err) {
     if (err) {
@@ -393,7 +393,7 @@ app.post('/api/chat', (req, res) => {
     }).join('\n\n');
 
     // 2. Dựng System Prompt cho hệ hỗ trợ ra quyết định (DSS)
-    const systemPrompt = `Bạn là Trợ lý ảo AI - Chuyên gia tư vấn và hỗ trợ ra quyết định mua hàng chuyên nghiệp cho website bán điện thoại di động "SmartPhone AI".
+    const systemPrompt = `Bạn là Trợ lý ảo AI - Chuyên gia tư vấn và hỗ trợ ra quyết định mua hàng chuyên nghiệp cho website bán điện thoại di động "QD Mobile".
 Nhiệm vụ của bạn là tư vấn, giải đáp cấu hình, so sánh các dòng máy và giúp khách hàng lựa chọn sản phẩm phù hợp nhất dựa trên nhu cầu của họ.
 
 Bạn chỉ được phép tư vấn dựa trên danh sách sản phẩm thực tế của cửa hàng dưới đây:
@@ -505,7 +505,7 @@ function generateOfflineResponse(message, products) {
                      cleanMsg === 'tư vấn giúp tôi';
 
   if (isGreeting) {
-    const greetingText = `Chào bạn! Tôi là Trợ lý ảo AI của cửa hàng SmartPhone AI hỗ trợ ra quyết định mua sắm.
+    const greetingText = `Chào bạn! Tôi là Trợ lý ảo AI của cửa hàng QD Mobile hỗ trợ ra quyết định mua sắm.
 
 Tôi có thể hỗ trợ bạn các công việc sau:
 1. 🔍 **Tìm kiếm điện thoại** theo ngân sách (ví dụ: 'dưới 10 triệu', 'dưới 5 triệu').

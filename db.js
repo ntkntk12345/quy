@@ -40,6 +40,7 @@ db.serialize(() => {
       battery TEXT,
       camera TEXT,
       image_url TEXT,
+      image_url_hover TEXT,
       description TEXT,
       promotion TEXT,
       rating_performance REAL,
@@ -48,6 +49,11 @@ db.serialize(() => {
       rating_price REAL
     )
   `);
+
+  // Tự động migration thêm cột image_url_hover nếu đã có database cũ
+  db.run("ALTER TABLE products ADD COLUMN image_url_hover TEXT", (err) => {
+    // Bỏ qua lỗi nếu cột đã tồn tại
+  });
 
   // 3. Tạo bảng Orders
   db.run(`
@@ -231,25 +237,37 @@ db.serialize(() => {
           rating_performance: 8.0,
           rating_camera: 8.0,
           rating_battery: 7.5,
-          rating_price: 7.5
+          rating_price: 7.5,
+          image_url_hover: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=600&auto=format&fit=crop&q=60'
         }
       ];
 
       const stmt = db.prepare(`
         INSERT INTO products (
-          name, brand, price, screen, cpu, ram, rom, battery, camera, image_url, description, promotion,
+          name, brand, price, screen, cpu, ram, rom, battery, camera, image_url, image_url_hover, description, promotion,
           rating_performance, rating_camera, rating_battery, rating_price
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
 
       sampleProducts.forEach((p) => {
         stmt.run([
-          p.name, p.brand, p.price, p.screen, p.cpu, p.ram, p.rom, p.battery, p.camera, p.image_url, p.description, p.promotion,
+          p.name, p.brand, p.price, p.screen, p.cpu, p.ram, p.rom, p.battery, p.camera, p.image_url, p.image_url_hover || null, p.description, p.promotion,
           p.rating_performance, p.rating_camera, p.rating_battery, p.rating_price
         ]);
       });
       stmt.finalize();
       console.log('Đã tạo thành công dữ liệu sản phẩm mẫu!');
+    } else {
+      // Tự động bổ sung ảnh hover mẫu cho database đã tồn tại để xem ngay hiệu ứng lật ảnh
+      db.serialize(() => {
+        db.run("UPDATE products SET image_url_hover = 'https://images.unsplash.com/photo-1695048133144-ecfae2efb650?w=600&auto=format&fit=crop&q=60' WHERE name LIKE '%iPhone 15%' AND (image_url_hover IS NULL OR image_url_hover = '')");
+        db.run("UPDATE products SET image_url_hover = 'https://images.unsplash.com/photo-1610945415295-d9b21034b5ac?w=600&auto=format&fit=crop&q=60' WHERE name LIKE '%S24%' AND (image_url_hover IS NULL OR image_url_hover = '')");
+        db.run("UPDATE products SET image_url_hover = 'https://images.unsplash.com/photo-1598327106026-d9521da673d1?w=600&auto=format&fit=crop&q=60' WHERE name LIKE '%Redmi%' AND (image_url_hover IS NULL OR image_url_hover = '')");
+        db.run("UPDATE products SET image_url_hover = 'https://images.unsplash.com/photo-1580910051372-e66b19885450?w=600&auto=format&fit=crop&q=60' WHERE name LIKE '%Reno11%' AND (image_url_hover IS NULL OR image_url_hover = '')");
+        db.run("UPDATE products SET image_url_hover = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=60' WHERE name LIKE '%Poco%' AND (image_url_hover IS NULL OR image_url_hover = '')");
+        db.run("UPDATE products SET image_url_hover = 'https://images.unsplash.com/photo-1565630916779-e303be97b6f5?w=600&auto=format&fit=crop&q=60' WHERE name LIKE '%A15%' AND (image_url_hover IS NULL OR image_url_hover = '')");
+        db.run("UPDATE products SET image_url_hover = 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=600&auto=format&fit=crop&q=60' WHERE name LIKE '%iPhone 13%' AND (image_url_hover IS NULL OR image_url_hover = '')");
+      });
     }
   });
 });

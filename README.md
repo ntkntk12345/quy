@@ -1,4 +1,4 @@
-# 📱 SmartPhone AI - Website Bán Điện Thoại Tích Hợp Chatbot AI Hỗ Trợ Quyết Định
+# 📱 QD Mobile - Website Bán Điện Thoại Tích Hợp Chatbot AI Hỗ Trợ Quyết Định
 
 Dự án website thương mại điện tử bán điện thoại di động tích hợp Trợ lý ảo AI (NVIDIA API) hỗ trợ ra quyết định mua sắm (Decision Support System - DSS).
 

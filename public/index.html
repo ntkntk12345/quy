@@ -1,14 +1,37 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartPhone AI - Hệ Hỗ Trợ Quyết Định Mua Sắm Điện Thoại</title>
+  <title>QD Mobile - Hệ Hỗ Trợ Quyết Định Mua Sắm Điện Thoại</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <!-- FontAwesome for vector icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
+
+  <!-- Three.js 3D Virtual Space Canvas -->
+  <canvas id="three-space-canvas"></canvas>
+
+  <!-- Splash Loading Screen -->
+  <div id="splash-screen" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <i class="fa-solid fa-mobile-screen-button"></i> QD <span>Mobile AI</span>
+      </div>
+      <div class="splash-description">Hệ Hỗ Trợ Quyết Định Chọn Mua Điện Thoại</div>
+      <div class="splash-loader-bar">
+        <div class="splash-loader-fill"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast Notifications Container -->
   <div id="toast-container" class="toast-container"></div>
@@ -16,32 +39,99 @@
   <!-- ==========================================================================
        HEADER & NAVIGATION
        ========================================================================== -->
-  <header>
-    <div class="container nav-wrapper">
-      <div class="logo" onclick="switchView('home')">
-        <i class="fa-solid fa-mobile-screen-button"></i> SmartPhone <span>AI</span>
+  <!-- ==========================================================================
+       HEADER & NAVIGATION (PREMIUM 2026 LIGHT THEME)
+       ========================================================================== -->
+  <header class="sticky-header">
+    <!-- Top Bar: Quick Announcement & Support -->
+    <div class="header-top-bar">
+      <div class="container top-bar-wrapper">
+        <div class="top-bar-left">
+          <span><i class="fa-solid fa-fire"></i> Giờ vàng Flash Sale đang diễn ra - Giảm tới 15%!</span>
+        </div>
+        <div class="top-bar-right">
+          <a onclick="showToast('Hotline tư vấn: 1800 6601 (Miễn phí)', 'info')"><i class="fa-solid fa-phone"></i> Hotline: 1800 6601</a>
+          <a onclick="toggleChat()"><i class="fa-solid fa-robot"></i> Trợ lý AI DSS</a>
+        </div>
       </div>
-      
-      <!-- Mobile hamburger toggle button -->
-      <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">
-        <i class="fa-solid fa-bars"></i>
-      </button>
+    </div>
 
-      <nav>
-        <ul class="nav-menu" id="nav-menu">
-          <li><a id="nav-link-home" onclick="switchView('home')">Trang chủ</a></li>
-          <li>
-            <a id="nav-link-cart" class="cart-badge-container" onclick="switchView('cart')">
-              <i class="fa-solid fa-cart-shopping"></i> Giỏ hàng 
+    <!-- Main Header Bar -->
+    <div class="header-main-bar">
+      <div class="container main-bar-wrapper">
+        <!-- Logo -->
+        <div class="logo" onclick="switchView('home')">
+          <i class="fa-solid fa-mobile-screen-button"></i> QD <span>Mobile</span>
+        </div>
+
+        <!-- Central Search Bar with Instant Suggestions -->
+        <div class="header-search-container">
+          <div class="header-search-wrapper">
+            <input type="text" id="header-search-input" placeholder="Bạn muốn tìm điện thoại nào hôm nay? (ví dụ: iPhone, Samsung...)" autocomplete="off">
+            <button class="header-search-btn" id="header-search-btn-trigger"><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+          <!-- Popover Suggestions list -->
+          <div class="search-suggestions-popover" id="header-search-suggestions" style="display: none;">
+            <!-- Suggested items are injected dynamically via app.js -->
+          </div>
+        </div>
+
+        <!-- Right Quick Actions -->
+        <div class="header-actions">
+          <!-- Notification Bell -->
+          <button class="action-icon-btn" onclick="showToast('Chưa có thông báo mới!', 'info')" title="Thông báo">
+            <i class="fa-regular fa-bell"></i>
+            <span class="action-badge">2</span>
+          </button>
+
+          <!-- Wishlist -->
+          <button class="action-icon-btn" onclick="showToast('Danh sách yêu thích trống!', 'info')" title="Yêu thích">
+            <i class="fa-regular fa-heart"></i>
+          </button>
+
+          <!-- Cart Badge Quick-link -->
+          <a id="nav-link-cart" class="cart-quick-link" onclick="switchView('cart')" title="Giỏ hàng">
+            <div class="cart-icon-wrapper">
+              <i class="fa-solid fa-cart-shopping"></i>
               <span class="cart-count" id="cart-count-badge">0</span>
-            </a>
-          </li>
-          <li><a id="nav-link-admin" onclick="switchView('admin')" style="display: none;"><i class="fa-solid fa-gauge-high"></i> Quản trị</a></li>
-          <li id="navbar-auth-btn">
-            <button class="btn btn-secondary" onclick="switchView('login')"><i class="fa-solid fa-user-lock"></i> Đăng nhập</button>
-          </li>
+            </div>
+            <div class="cart-text-wrapper">
+              <span class="cart-label">Giỏ hàng</span>
+            </div>
+          </a>
+
+          <!-- Admin Quick link (visible to admin role) -->
+          <a id="nav-link-admin" class="admin-quick-link-btn" onclick="switchView('admin')" style="display: none;" title="Quản trị hệ thống">
+            <i class="fa-solid fa-user-gear"></i> Admin
+          </a>
+
+          <!-- Auth Account Section -->
+          <div id="navbar-auth-btn" class="auth-wrapper-header">
+            <button class="btn btn-login-header" onclick="switchView('login')">
+              <i class="fa-regular fa-user"></i> Đăng nhập
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile hamburger toggle button -->
+        <button class="hamburger" id="hamburger-btn" onclick="toggleMobileMenu()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sub-Navbar: Categories Quick Filter -->
+    <div class="header-sub-nav">
+      <div class="container sub-nav-wrapper">
+        <ul class="sub-nav-menu" id="nav-menu">
+          <li><a id="nav-link-home" class="active" onclick="switchView('home')"><i class="fa-solid fa-house-chimney"></i> Trang chủ</a></li>
+          <li><a onclick="filterByBrandHeader('Apple')"><i class="fa-brands fa-apple"></i> Apple iPhone</a></li>
+          <li><a onclick="filterByBrandHeader('Samsung')"><i class="fa-solid fa-mobile-screen"></i> Samsung Galaxy</a></li>
+          <li><a onclick="filterByBrandHeader('Xiaomi')"><i class="fa-solid fa-mobile-screen"></i> Xiaomi Redmi</a></li>
+          <li><a onclick="filterByBrandHeader('Oppo')"><i class="fa-solid fa-mobile-screen"></i> Oppo Reno</a></li>
+          <li class="nav-highlight-ai"><a onclick="toggleChat()"><i class="fa-solid fa-brain"></i> Trợ lý AI DSS</a></li>
         </ul>
-      </nav>
+      </div>
     </div>
   </header>
 
@@ -50,42 +140,162 @@
          VIEW: HOME (PRODUCT CATALOG & HERO)
          ========================================================================== -->
     <section id="section-home" class="view-section active">
-      <!-- Hero Banner -->
-      <div class="hero-wrapper">
-        <div class="hero-text">
-          <h1>Chọn Điện Thoại Thông Minh<br>Sự Hỗ Trợ Từ <span>Trí Tuệ Nhân Tạo AI</span></h1>
-          <p>Hệ hỗ trợ ra quyết định (AI DSS) giúp bạn so sánh cấu hình phần cứng, đánh giá hiệu năng trên giá bán và đề xuất dòng điện thoại tối ưu nhất theo túi tiền của bạn.</p>
-          <div class="hero-ctas">
-            <button class="btn btn-primary" onclick="scrollToCatalog()"><i class="fa-solid fa-store"></i> Mua ngay</button>
-            <button class="btn btn-secondary" onclick="toggleChat()"><i class="fa-solid fa-robot"></i> Tư vấn AI</button>
+      <!-- Slideshow Banner -->
+      <div class="slideshow-container">
+        <!-- Floating neon blur elements -->
+        <div class="hero-glow-1"></div>
+        <div class="hero-glow-2"></div>
+        <div class="slide fade active">
+          <div class="hero-wrapper">
+            <div class="hero-text">
+              <h1>Chọn Điện Thoại Thông Minh<br>Sự Hỗ Trợ Từ <span>Trí Tuệ Nhân Tạo AI</span></h1>
+              <p>Hệ hỗ trợ ra quyết định (AI DSS) của <strong>QD Mobile</strong> giúp bạn so sánh cấu hình phần cứng,
+                đánh giá hiệu năng trên giá bán và đề xuất dòng điện thoại tối ưu nhất theo túi tiền của bạn.</p>
+              <div class="hero-ctas">
+                <button class="btn btn-primary" onclick="scrollToCatalog()"><i class="fa-solid fa-store"></i> Mua
+                  ngay</button>
+                <button class="btn btn-secondary" onclick="toggleChat()"><i class="fa-solid fa-robot"></i> Tư vấn
+                  AI</button>
+              </div>
+            </div>
+            <div class="hero-graphic">
+              <div class="hero-product-glass-frame">
+                <img src="https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600&auto=format&fit=crop&q=60"
+                  alt="Mockup điện thoại nổi">
+              </div>
+            </div>
           </div>
         </div>
-        <div class="hero-graphic">
-          <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=60" alt="Mockup điện thoại nổi">
+
+        <div class="slide fade">
+          <div class="hero-wrapper">
+            <div class="hero-text">
+              <h1>iPhone 15 Pro Max Titan<br>Đỉnh Cao <span>Chip A17 Pro</span></h1>
+              <p>Trải nghiệm khung Titan siêu nhẹ, nút Action mới và chip A17 Pro cực mạnh. Điểm hiệu năng AI DSS đạt
+                9.8/10. Tặng kèm củ sạc nhanh 20W chính hãng và gói bảo hành VIP 12 tháng.</p>
+              <div class="hero-ctas">
+                <button class="btn btn-primary" onclick="switchView('detail', {productId: 1})"><i
+                    class="fa-solid fa-circle-info"></i> Xem chi tiết</button>
+                <button class="btn btn-secondary" onclick="toggleChat()"><i class="fa-solid fa-robot"></i> Tư vấn
+                  AI</button>
+              </div>
+            </div>
+            <div class="hero-graphic">
+              <div class="hero-product-glass-frame">
+                <img src="https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&auto=format&fit=crop&q=60"
+                  alt="iPhone 15 Pro Max">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide fade">
+          <div class="hero-wrapper">
+            <div class="hero-text">
+              <h1>Galaxy S24 Ultra Đỉnh Cao<br>Trải Nghiệm <span>Galaxy AI</span></h1>
+              <p>Trải nghiệm công nghệ AI dịch thuật thời gian thực, bút S-Pen thông minh và camera mắt thần bóng đêm
+                200MP. Điểm camera AI DSS đạt 9.8/10, tặng Voucher phụ kiện trị giá 1.5tr.</p>
+              <div class="hero-ctas">
+                <button class="btn btn-primary" onclick="switchView('detail', {productId: 2})"><i
+                    class="fa-solid fa-circle-info"></i> Xem chi tiết</button>
+                <button class="btn btn-secondary" onclick="toggleChat()"><i class="fa-solid fa-robot"></i> Tư vấn
+                  AI</button>
+              </div>
+            </div>
+            <div class="hero-graphic">
+              <div class="hero-product-glass-frame">
+                <img src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&auto=format&fit=crop&q=60"
+                  alt="Galaxy S24 Ultra">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navigation Dots / Arrow controls -->
+        <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+        <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        <div class="slideshow-dots">
+          <span class="dot active" onclick="currentSlide(1)"></span>
+          <span class="dot" onclick="currentSlide(2)"></span>
+          <span class="dot" onclick="currentSlide(3)"></span>
         </div>
       </div>
 
-      <!-- Features Section (Reasons to buy) -->
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-truck-fast"></i></div>
-          <h3>Giao Hàng Siêu Tốc 2H</h3>
-          <p>Nhận máy nhanh chóng tại các quận nội thành chỉ trong 120 phút.</p>
+      <!-- ==========================================================================
+           BRAND CATEGORIES SECTION (PREMIUM CARDS)
+           ========================================================================== -->
+      <div class="brand-categories-section">
+        <h3 class="section-title">Danh mục thương hiệu nổi bật</h3>
+        <div class="brand-categories-grid">
+          <div class="brand-cat-card" onclick="filterByBrandHeader('Apple')">
+            <div class="brand-logo-wrapper apple"><i class="fa-brands fa-apple"></i></div>
+            <span class="brand-name">Apple (iPhone)</span>
+          </div>
+          <div class="brand-cat-card" onclick="filterByBrandHeader('Samsung')">
+            <div class="brand-logo-wrapper samsung"><i class="fa-solid fa-mobile-screen"></i></div>
+            <span class="brand-name">Samsung</span>
+          </div>
+          <div class="brand-cat-card" onclick="filterByBrandHeader('Xiaomi')">
+            <div class="brand-logo-wrapper xiaomi"><i class="fa-solid fa-rocket"></i></div>
+            <span class="brand-name">Xiaomi</span>
+          </div>
+          <div class="brand-cat-card" onclick="filterByBrandHeader('Oppo')">
+            <div class="brand-logo-wrapper oppo"><i class="fa-solid fa-infinity"></i></div>
+            <span class="brand-name">Oppo</span>
+          </div>
+          <div class="brand-cat-card" onclick="filterByBrandHeader('Vivo')">
+            <div class="brand-logo-wrapper vivo"><i class="fa-solid fa-gem"></i></div>
+            <span class="brand-name">Vivo</span>
+          </div>
+          <div class="brand-cat-card" onclick="filterByBrandHeader('Realme')">
+            <div class="brand-logo-wrapper realme"><i class="fa-solid fa-bolt-lightning"></i></div>
+            <span class="brand-name">Realme</span>
+          </div>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
-          <h3>Bảo Hành 1 Đổi 1</h3>
-          <p>Cam kết 12 tháng chính hãng, lỗi phần cứng đổi máy mới ngay lập tức.</p>
+      </div>
+
+      <!-- ==========================================================================
+           FLASH SALE SECTION (WITH REAL TIME COUNTDOWN & SOLD COUNTER)
+           ========================================================================== -->
+      <div class="flash-sale-wrapper">
+        <div class="flash-sale-header">
+          <div class="flash-sale-title-block">
+            <i class="fa-solid fa-bolt flash-sale-bolt"></i>
+            <h2>GIỜ VÀNG FLASH SALE</h2>
+            <div class="countdown-timer" id="flash-sale-countdown">
+              <span class="time-box" id="fs-hours">02</span>
+              <span class="time-colon">:</span>
+              <span class="time-box" id="fs-minutes">45</span>
+              <span class="time-colon">:</span>
+              <span class="time-box" id="fs-seconds">12</span>
+            </div>
+          </div>
+          <span class="flash-sale-status-badge">Đang diễn ra</span>
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-credit-card"></i></div>
-          <h3>Trả Góp 0% Lãi Suất</h3>
-          <p>Hỗ trợ xét duyệt nhanh qua thẻ tín dụng và hồ sơ duyệt trong 15 phút.</p>
+        
+        <div class="flash-sale-products-grid" id="flash-sale-grid-container">
+          <!-- Dynamic Flash sale items injected via app.js -->
         </div>
-        <div class="feature-card">
-          <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
-          <h3>AI Hỗ Trợ Chọn Máy</h3>
-          <p>Trợ lý ảo phân tích, chấm điểm các dòng máy phù hợp nhất ngân sách.</p>
+      </div>
+
+      <!-- ==========================================================================
+           PREMIUM PROMO BANNER (HIGH CONVERSION)
+           ========================================================================== -->
+      <div class="tech-promo-banner-container">
+        <div class="promo-banner-content">
+          <div class="promo-text-side">
+            <span class="promo-badge">Độc quyền tại QD Mobile</span>
+            <h2>Thu Cũ Đổi Mới - Trợ Giá Lên Tới 2 Triệu</h2>
+            <p>Nâng cấp lên iPhone 15 Pro Max & Galaxy S24 Ultra dễ dàng nhất. Thủ tục 5 phút, không lo bù nhiều tiền, duyệt hồ sơ online cực nhanh.</p>
+            <div class="promo-ctas">
+              <button class="btn btn-primary" onclick="toggleChat()"><i class="fa-solid fa-comments"></i> Định giá máy ngay</button>
+              <span class="promo-subtext">*Áp dụng cho tất cả dòng máy cũ trên thị trường</span>
+            </div>
+          </div>
+          <div class="promo-graphic-side">
+            <div class="floating-bubble glow-blue"></div>
+            <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=60" alt="Trade-in phone illustration">
+          </div>
         </div>
       </div>
 
@@ -96,8 +306,8 @@
           <div class="filter-section">
             <h4>Tìm Kiếm</h4>
             <div class="form-group" style="margin-bottom: 0;">
-              <input type="text" id="search-input" placeholder="Tìm theo tên chip, máy..." style="background-color: var(--bg-surface); padding: 8px 12px; font-size:12px;">
-              <button class="btn btn-primary" id="search-btn" style="width: 100%; margin-top: 8px; padding: 8px;"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+              <input type="text" id="search-input" placeholder="Tìm theo tên chip, máy...">
+              <button id="search-btn" title="Tìm kiếm"><i class="fa-solid fa-magnifying-glass"></i></button>
             </div>
           </div>
           <div class="filter-section">
@@ -145,80 +355,120 @@
     </section>
 
     <!-- ==========================================================================
-         VIEW: PRODUCT DETAIL
+         VIEW: PRODUCT DETAIL (PREMIUM 2026 LAYOUT)
          ========================================================================== -->
     <section id="section-detail" class="view-section">
-      <a class="back-link" onclick="switchView('home')" style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; color:var(--primary); font-weight:700; margin-bottom:20px;">
-        <i class="fa-solid fa-arrow-left"></i> Quay lại cửa hàng
-      </a>
-      
+      <div class="breadcrumb-nav">
+        <a onclick="switchView('home')"><i class="fa-solid fa-house"></i> Trang chủ</a>
+        <i class="fa-solid fa-chevron-right separator"></i>
+        <span id="detail-breadcrumb-brand">Điện thoại</span>
+        <i class="fa-solid fa-chevron-right separator"></i>
+        <span class="active" id="detail-breadcrumb-name">Chi tiết sản phẩm</span>
+      </div>
+
       <div class="detail-view-container">
         <!-- 2 Columns main detail -->
         <div class="detail-main-grid">
+          <!-- Gallery Left Side -->
           <div class="detail-left">
-            <img id="detail-image" src="" alt="Ảnh sản phẩm">
+            <div class="main-image-wrapper">
+              <img id="detail-image" src="" alt="Ảnh sản phẩm" class="main-image-zoom">
+            </div>
+            <!-- Thumbnails selection bar -->
+            <div class="detail-gallery-thumbs" id="detail-thumbnails-list">
+              <!-- Dynamically populated via app.js -->
+            </div>
           </div>
-          
+
+          <!-- Specifications & Purchase Right Side -->
           <div class="detail-right">
-            <span class="detail-header-brand" id="detail-brand">APPLE</span>
-            <h1 id="detail-name">Tên sản phẩm điện thoại</h1>
-            
-            <div class="detail-meta-row">
-              <div class="detail-meta-rating">
-                <i class="fa-solid fa-star"></i> <i class="fa-solid fa-star"></i> <i class="fa-solid fa-star"></i> <i class="fa-solid fa-star"></i> <i class="fa-solid fa-star-half-stroke"></i>
-                <span>4.8</span>
-              </div>
-              <span class="detail-meta-status"><i class="fa-solid fa-check"></i> Còn hàng</span>
+            <div class="detail-top-brand-row">
+              <span class="detail-header-brand" id="detail-brand">APPLE</span>
+              <span class="detail-installment-badge"><i class="fa-solid fa-percent"></i> Trả góp 0%</span>
             </div>
             
+            <h1 id="detail-name">Tên sản phẩm điện thoại</h1>
+
+            <div class="detail-meta-row">
+              <div class="detail-meta-rating">
+                <i class="fa-solid fa-star"></i> <i class="fa-solid fa-star"></i> <i class="fa-solid fa-star"></i> <i
+                  class="fa-solid fa-star"></i> <i class="fa-solid fa-star-half-stroke"></i>
+                <span>4.8</span>
+              </div>
+              <span class="detail-meta-sold-count"><i class="fa-solid fa-bag-shopping"></i> Đã bán 2.4k</span>
+              <span class="detail-meta-status"><i class="fa-solid fa-check"></i> Sẵn hàng tại cửa hàng</span>
+            </div>
+
             <div class="detail-price-row">
               <span class="detail-price-curr" id="detail-price">0 đ</span>
               <span class="detail-price-old" id="detail-old-price">0 đ</span>
+              <span class="detail-price-discount" id="detail-discount-percent">-15%</span>
             </div>
-            
+
+            <!-- Promotion Box -->
             <div class="detail-promotion-box">
               <div class="detail-promo-title">
-                <i class="fa-solid fa-gift"></i> Khuyến mãi khi đặt mua trực tuyến
+                <i class="fa-solid fa-gift"></i> Khuyến mãi khi đặt mua trực tuyến (Online Exclusive)
               </div>
               <div class="detail-promo-text" id="detail-promo">
                 Khuyến mãi chi tiết...
               </div>
             </div>
-            
+
+            <!-- Modern Credit Card Installments calculations block -->
+            <div class="detail-installment-box">
+              <div class="installment-title">
+                <i class="fa-solid fa-credit-card"></i> Trả góp qua thẻ tín dụng 0% Lãi suất
+              </div>
+              <p class="installment-desc">Chỉ từ <strong id="detail-installment-monthly">1.250.000 đ/tháng</strong> (Kỳ hạn 12 tháng, miễn phí bảo hiểm hồ sơ, xét duyệt nhanh 15 phút).</p>
+            </div>
+
             <div class="detail-actions-row">
-              <button class="btn btn-primary btn-detail-buy" id="detail-buy-btn"><i class="fa-solid fa-wallet"></i> Mua Ngay</button>
-              <button class="btn btn-secondary btn-detail-addcart" id="detail-add-cart-btn"><i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ</button>
+              <button class="btn btn-primary btn-detail-buy" id="detail-buy-btn">
+                <i class="fa-solid fa-bolt"></i>
+                <div class="btn-double-text">
+                  <strong>MUA NGAY</strong>
+                  <span>Giao nhanh 2 giờ hoặc nhận tại shop</span>
+                </div>
+              </button>
+              <button class="btn btn-secondary btn-detail-addcart" id="detail-add-cart-btn">
+                <i class="fa-solid fa-cart-plus"></i> Thêm giỏ hàng
+              </button>
             </div>
           </div>
         </div>
-        
+
         <!-- Tabs Section for details -->
         <div class="detail-tabs-wrapper">
           <div class="tab-headers">
             <button class="tab-header-btn active" onclick="switchDetailTab('desc', this)">Mô tả sản phẩm</button>
             <button class="tab-header-btn" onclick="switchDetailTab('specs', this)">Thông số kỹ thuật</button>
-            <button class="tab-header-btn" id="dss-tab-header" onclick="switchDetailTab('dss', this)"><i class="fa-solid fa-robot"></i> Đánh giá AI DSS</button>
+            <button class="tab-header-btn" id="dss-tab-header" onclick="switchDetailTab('dss', this)"><i
+                class="fa-solid fa-robot"></i> Đánh giá AI DSS</button>
           </div>
-          
+
           <!-- Tab Panel: Description -->
           <div class="tab-panel active" id="tab-panel-desc">
             <p id="detail-desc">Mô tả đặc điểm nổi bật của điện thoại ở đây...</p>
           </div>
-          
+
           <!-- Tab Panel: Technical Specs -->
           <div class="tab-panel" id="tab-panel-specs">
             <table class="detail-specs-table" id="detail-specs-table">
               <!-- JS tự động điền bảng cấu hình -->
             </table>
           </div>
-          
+
           <!-- Tab Panel: AI DSS Rating progress -->
           <div class="tab-panel" id="tab-panel-dss">
             <div class="dss-tab-grid">
               <div class="dss-tab-left">
                 <h3>Thang Điểm Ra Quyết Định</h3>
-                <p>Hệ thống đánh giá sản phẩm dựa trên thuật toán so khớp giữa các chỉ số chất lượng phần cứng trong cơ sở dữ liệu giúp khách hàng cân đối các tiêu chí hiệu năng và kinh tế.</p>
-                <button class="btn btn-outline" id="chatbot-suggest-compare" style="margin-top:20px; font-size:12px; width:100%;"><i class="fa-solid fa-comments-dollar"></i> Tư vấn và so sánh bằng AI</button>
+                <p>Hệ thống đánh giá sản phẩm dựa trên thuật toán so khớp giữa các chỉ số chất lượng phần cứng trong cơ
+                  sở dữ liệu giúp khách hàng cân đối các tiêu chí hiệu năng và kinh tế.</p>
+                <button class="btn btn-outline" id="chatbot-suggest-compare"
+                  style="margin-top:20px; font-size:12px; width:100%;"><i class="fa-solid fa-comments-dollar"></i> Tư
+                  vấn và so sánh bằng AI</button>
               </div>
               <div class="dss-ratings-list">
                 <!-- Perf -->
@@ -277,65 +527,118 @@
     </section>
 
     <!-- ==========================================================================
-         VIEW: SHOPPING CART & CHECKOUT
+         VIEW: SHOPPING CART & CHECKOUT (PREMIUM 2026 EDITION)
          ========================================================================== -->
     <section id="section-cart" class="view-section">
       <div class="cart-grid-wrapper">
         <!-- Left cart list -->
         <div class="cart-card">
-          <h2 class="cart-header-title"><i class="fa-solid fa-cart-flatbed"></i> Các sản phẩm trong giỏ hàng</h2>
+          <h2 class="cart-header-title">
+            <i class="fa-solid fa-basket-shopping"></i>
+            <span>Các sản phẩm trong giỏ hàng</span>
+          </h2>
           <div id="cart-items-list">
             <!-- JS chèn danh sách sản phẩm -->
           </div>
+
+          <!-- Coupon Code Box -->
+          <div class="cart-coupon-container">
+            <div class="coupon-header">
+              <i class="fa-solid fa-tag"></i> Mã giảm giá / Voucher ưu đãi
+            </div>
+            <div class="coupon-input-wrapper">
+              <input type="text" id="checkout-promo-input" placeholder="Nhập mã ưu đãi (ví dụ: QDMOBILE, SALES2026)">
+              <button class="btn btn-secondary" type="button" onclick="applyPromoCode()">Áp dụng</button>
+            </div>
+            <div id="promo-applied-message" class="promo-msg" style="display: none;"></div>
+          </div>
         </div>
-        
+
         <!-- Right summary checkout -->
         <div class="checkout-panel-card" id="cart-summary-box">
-          <h3 class="cart-header-title" style="margin-bottom:16px; padding-bottom:8px;"><i class="fa-solid fa-file-invoice-dollar"></i> Đơn hàng của bạn</h3>
-          
+          <h3 class="cart-header-title" style="margin-bottom:16px; padding-bottom:8px;">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Hóa đơn & Thanh toán</span>
+          </h3>
+
           <div class="summary-rows">
             <div class="summary-item-row">
-              <span>Tổng số lượng:</span>
-              <span id="summary-qty">0</span>
+              <span>Tổng số lượng điện thoại:</span>
+              <span id="summary-qty" class="weight-bold">0</span>
             </div>
             <div class="summary-item-row">
-              <span>Tạm tính:</span>
+              <span>Tạm tính giá trị máy:</span>
               <span id="summary-subtotal">0 đ</span>
             </div>
+            <div class="summary-item-row" id="summary-discount-row" style="display: none; color: var(--accent);">
+              <span>Mã giảm giá áp dụng:</span>
+              <span id="summary-discount-val">-0 đ</span>
+            </div>
             <div class="summary-item-row" style="color:var(--success);">
-              <span>Phí giao hàng:</span>
-              <span>Miễn phí</span>
+              <span>Phí vận chuyển siêu tốc:</span>
+              <span class="weight-bold"><i class="fa-solid fa-truck-fast"></i> Miễn phí (Freeship)</span>
             </div>
             <div class="summary-item-row total">
-              <span>Tổng cộng:</span>
+              <span>Tổng số tiền cần trả:</span>
               <span id="summary-total">0 đ</span>
             </div>
           </div>
-          
+
           <!-- Billing Form -->
-          <form id="checkout-form" onsubmit="submitOrder(event)">
+          <form id="checkout-form" onsubmit="submitOrder(event)" class="checkout-billing-form">
             <div class="form-group">
-              <label for="checkout-name">Họ và tên khách hàng *</label>
-              <input type="text" id="checkout-name" required placeholder="Ví dụ: Nguyễn Văn A">
+              <label for="checkout-name">Họ và tên người nhận hàng *</label>
+              <div class="input-icon-wrapper">
+                <i class="fa-regular fa-user"></i>
+                <input type="text" id="checkout-name" required placeholder="Nhập tên đầy đủ (ví dụ: Nguyễn Văn A)">
+              </div>
             </div>
             <div class="form-group">
               <label for="checkout-phone">Số điện thoại giao hàng *</label>
-              <input type="tel" id="checkout-phone" required placeholder="Ví dụ: 0987654321">
+              <div class="input-icon-wrapper">
+                <i class="fa-solid fa-phone-volume"></i>
+                <input type="tel" id="checkout-phone" required placeholder="Nhập số điện thoại liên hệ">
+              </div>
             </div>
             <div class="form-group">
-              <label for="checkout-email">Địa chỉ Email *</label>
-              <input type="email" id="checkout-email" required placeholder="Ví dụ: customera@gmail.com">
+              <label for="checkout-email">Địa chỉ Email liên hệ *</label>
+              <div class="input-icon-wrapper">
+                <i class="fa-regular fa-envelope"></i>
+                <input type="email" id="checkout-email" required placeholder="Ví dụ: hotro@qdmobile.vn">
+              </div>
             </div>
             <div class="form-group">
-              <label for="checkout-address">Địa chỉ giao hàng chi tiết *</label>
-              <textarea id="checkout-address" rows="3" required placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."></textarea>
+              <label for="checkout-address">Địa chỉ chi tiết nhận máy *</label>
+              <textarea id="checkout-address" rows="2" required placeholder="Số nhà, ngõ/tên đường, phường/xã, quận/huyện..."></textarea>
             </div>
-            
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; margin-top: 8px;"><i class="fa-solid fa-credit-card"></i> Xác Nhận Mua Hàng</button>
+
+            <!-- Visual Payment Method Option Tiles -->
+            <div class="form-group">
+              <label>Hình thức thanh toán ưa thích *</label>
+              <div class="payment-methods-grid">
+                <div class="payment-method-tile active" id="pay-tile-cod" onclick="selectPaymentMethod('cod')">
+                  <div class="tile-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                  <span>Thanh toán COD khi nhận máy</span>
+                </div>
+                <div class="payment-method-tile" id="pay-tile-bank" onclick="selectPaymentMethod('bank')">
+                  <div class="tile-icon"><i class="fa-solid fa-building-columns"></i></div>
+                  <span>Chuyển khoản (Nhận ngay Voucher 100K)</span>
+                </div>
+                <div class="payment-method-tile" id="pay-tile-online" onclick="selectPaymentMethod('online')">
+                  <div class="tile-icon"><i class="fa-solid fa-wallet"></i></div>
+                  <span>Ví điện tử VNPAY / Credit card</span>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit-checkout">
+              <i class="fa-solid fa-shield-check"></i> XÁC NHẬN MUA HÀNG NGAY
+            </button>
           </form>
         </div>
       </div>
     </section>
+
 
     <!-- ==========================================================================
          VIEW: LOGIN / REGISTER
@@ -356,7 +659,8 @@
             <label for="login-password">Mật khẩu (Password)</label>
             <input type="password" id="login-password" required placeholder="Mật khẩu (admin123/123456)">
           </div>
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:8px;"><i class="fa-solid fa-arrow-right-to-bracket"></i> Đăng Nhập</button>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:8px;"><i
+              class="fa-solid fa-arrow-right-to-bracket"></i> Đăng Nhập</button>
         </form>
         <p style="margin-top: 20px; text-align: center; font-size: 13px; color: var(--text-secondary);">
           Bạn chưa có tài khoản? <a class="auth-switch-link" onclick="toggleAuthMode('register')">Đăng ký thành viên</a>
@@ -390,7 +694,8 @@
             <label for="reg-phone">Số điện thoại di động *</label>
             <input type="tel" id="reg-phone" required placeholder="Ví dụ: 0912345678">
           </div>
-          <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:8px;"><i class="fa-solid fa-user-plus"></i> Đăng Ký Thành Viên</button>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:8px;"><i
+              class="fa-solid fa-user-plus"></i> Đăng Ký Thành Viên</button>
         </form>
         <p style="margin-top: 20px; text-align: center; font-size: 13px; color: var(--text-secondary);">
           Đã có tài khoản? <a class="auth-switch-link" onclick="toggleAuthMode('login')">Quay lại đăng nhập</a>
@@ -418,7 +723,7 @@
             </li>
           </ul>
         </aside>
-        
+
         <!-- Main Content Area -->
         <div style="display:flex; flex-direction:column; gap:24px;">
           <!-- Stats Summary Grid -->
@@ -452,14 +757,16 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Admin Panel Table wrapper -->
           <div class="admin-main-panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:16px;">
+            <div
+              style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-color); padding-bottom:16px;">
               <h2 id="admin-content-title" style="font-size:18px; font-weight:800;">Sản phẩm bán tại cửa hàng</h2>
-              <button class="btn btn-primary" id="admin-add-product-btn" onclick="openProductModal()"><i class="fa-solid fa-plus"></i> Thêm sản phẩm mới</button>
+              <button class="btn btn-primary" id="admin-add-product-btn" onclick="openProductModal()"><i
+                  class="fa-solid fa-plus"></i> Thêm sản phẩm mới</button>
             </div>
-            
+
             <div id="admin-table-container">
               <!-- JS render table ở đây -->
             </div>
@@ -475,11 +782,13 @@
   <div class="modal-overlay" id="admin-product-modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeProductModal()"><i class="fa-solid fa-xmark"></i></button>
-      <h2 id="modal-title" style="font-size: 18px; font-weight: 800; margin-bottom: 24px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">Thêm sản phẩm mới</h2>
-      
+      <h2 id="modal-title"
+        style="font-size: 18px; font-weight: 800; margin-bottom: 24px; border-bottom:1px solid var(--border-color); padding-bottom:12px;">
+        Thêm sản phẩm mới</h2>
+
       <form id="product-form">
         <input type="hidden" id="form-product-id">
-        
+
         <div class="admin-form-grid">
           <div class="form-group">
             <label for="form-name">Tên sản phẩm *</label>
@@ -521,11 +830,17 @@
             <label for="form-image-url">Liên kết hình ảnh (Image URL)</label>
             <input type="text" id="form-image-url" placeholder="http://domain.com/image.png">
           </div>
-          
-          <div class="form-group span-2" style="border-top:1px solid var(--border-color); padding-top:16px; margin-bottom:0;">
-            <label style="color:var(--primary); font-weight:800; font-size:12px;">ĐÁNH GIÁ CHỈ SỐ AI DSS (Từ 1 đến 10)</label>
+          <div class="form-group">
+            <label for="form-image-url-hover">Ảnh khi di chuột qua (Hover Image URL)</label>
+            <input type="text" id="form-image-url-hover" placeholder="http://domain.com/image-hover.png">
           </div>
-          
+
+          <div class="form-group span-2"
+            style="border-top:1px solid var(--border-color); padding-top:16px; margin-bottom:0;">
+            <label style="color:var(--primary); font-weight:800; font-size:12px;">ĐÁNH GIÁ CHỈ SỐ AI DSS (Từ 1 đến
+              10)</label>
+          </div>
+
           <div class="form-group">
             <label for="form-rating-perf">Điểm Hiệu năng</label>
             <input type="number" step="0.1" min="1" max="10" id="form-rating-perf" placeholder="9.5">
@@ -552,8 +867,9 @@
             <textarea id="form-description" rows="3" placeholder="Đặc điểm nổi bật của máy..."></textarea>
           </div>
         </div>
-        
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:16px;"><i class="fa-solid fa-floppy-disk"></i> Lưu Thông Tin Sản Phẩm</button>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding:12px; margin-top:16px;"><i
+            class="fa-solid fa-floppy-disk"></i> Lưu Thông Tin Sản Phẩm</button>
       </form>
     </div>
   </div>
@@ -571,17 +887,17 @@
       <div class="chat-header-info">
         <div class="chat-avatar"><i class="fa-solid fa-robot" style="color:var(--primary);"></i></div>
         <div class="chat-header-text">
-          <h4>Trợ Lý SmartPhone AI</h4>
+          <h4>Trợ Lý QD Mobile AI</h4>
           <span class="chat-online-indicator">Hỗ trợ ra quyết định</span>
         </div>
       </div>
       <button class="chat-close-btn" onclick="toggleChat()"><i class="fa-solid fa-chevron-down"></i></button>
     </div>
-    
+
     <!-- Chat logs -->
     <div class="chat-body" id="chat-body-container">
       <!-- Tin nhắn do JS chèn động -->
-      
+
       <!-- Typing loader -->
       <div class="chat-typing-container" id="chat-typing-indicator">
         <div class="chat-typing-dots">
@@ -594,10 +910,16 @@
 
     <!-- Quick suggestions -->
     <div class="chat-suggestions-wrapper">
-      <button class="chat-suggest-btn" onclick="sendSuggestedMessage('Tư vấn điện thoại dưới 10 triệu chơi game tốt')">🎮 Dưới 10tr chơi game tốt</button>
-      <button class="chat-suggest-btn" onclick="sendSuggestedMessage('So sánh iPhone 15 Pro Max và Galaxy S24 Ultra')">⚔️ So sánh iPhone 15 vs S24 Ultra</button>
-      <button class="chat-suggest-btn" onclick="sendSuggestedMessage('Có khuyến mãi gì hôm nay?')">🎁 Khuyến mãi hot hôm nay</button>
-      <button class="chat-suggest-btn" onclick="sendSuggestedMessage('Hướng dẫn mua hàng online tại shop')">🛒 Hướng dẫn mua hàng online</button>
+      <button class="chat-suggest-btn"
+        onclick="sendSuggestedMessage('Tư vấn điện thoại dưới 10 triệu chơi game tốt')">🎮 Dưới 10tr chơi game
+        tốt</button>
+      <button class="chat-suggest-btn"
+        onclick="sendSuggestedMessage('So sánh iPhone 15 Pro Max và Galaxy S24 Ultra')">⚔️ So sánh iPhone 15 vs S24
+        Ultra</button>
+      <button class="chat-suggest-btn" onclick="sendSuggestedMessage('Có khuyến mãi gì hôm nay?')">🎁 Khuyến mãi hot hôm
+        nay</button>
+      <button class="chat-suggest-btn" onclick="sendSuggestedMessage('Hướng dẫn mua hàng online tại shop')">🛒 Hướng dẫn
+        mua hàng online</button>
     </div>
 
     <!-- Message input -->
@@ -607,13 +929,119 @@
     </div>
   </div>
 
-  <footer style="margin-top: 80px; padding: 48px 0; border-top: 1px solid var(--border-color); background-color:#fff; text-align: center; color: var(--text-secondary); font-size: 14px;">
+  <footer
+    style="margin-top: 80px; padding: 60px 0 40px 0; border-top: 1px solid var(--border-color); background-color: #FFFFFF; color: var(--text-secondary); font-size: 14px;">
     <div class="container">
-      <p style="font-weight:700;">&copy; 2026 SmartPhone AI System. All rights reserved.</p>
-      <p style="margin-top: 8px; font-size: 12px; color:var(--text-muted);">Hệ hỗ trợ ra quyết định mua hàng (DSS) sử dụng NVIDIA Chat Completions.</p>
+      <!-- Features Section inside Footer container -->
+      <div class="features-grid"
+        style="margin-bottom: 48px; border-bottom: 1px solid var(--border-color); padding-bottom: 48px;">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-truck-fast"></i></div>
+          <h3>Giao Hàng Siêu Tốc 2H</h3>
+          <p>Nhận máy nhanh chóng tại các quận nội thành chỉ trong 120 phút.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <h3>Bảo Hành 1 Đổi 1</h3>
+          <p>Cam kết 12 tháng chính hãng, lỗi phần cứng đổi máy mới ngay lập tức.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-credit-card"></i></div>
+          <h3>Trả Góp 0% Lãi Suất</h3>
+          <p>Hỗ trợ xét duyệt nhanh qua thẻ tín dụng và hồ sơ duyệt trong 15 phút.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fa-solid fa-right-left"></i></div>
+          <h3>Thu Cũ Đổi Mới</h3>
+          <p>Thu mua máy cũ tại nhà nhanh chóng, trợ giá nâng cấp lên tới 2 triệu.</p>
+        </div>
+      </div>
+
+      <!-- Main Footer Columns -->
+      <div class="footer-columns-grid">
+        <!-- Col 1: Brand & Contact Info -->
+        <div class="footer-col-info">
+          <div class="logo" style="margin-bottom: 16px;" onclick="switchView('home')">
+            <i class="fa-solid fa-mobile-screen-button"></i> QD <span>Mobile</span>
+          </div>
+          <p class="footer-about-text">Hệ thống bán lẻ điện thoại di động chính hãng và dịch vụ hỗ trợ khách hàng chuyên nghiệp hàng đầu tại Việt Nam.</p>
+          <div class="footer-hotline-box">
+            <span class="hotline-title">Tổng đài tư vấn miễn phí (8h00 - 22h00)</span>
+            <span class="hotline-number"><i class="fa-solid fa-phone-volume"></i> 1800 6601</span>
+          </div>
+        </div>
+
+        <!-- Col 2: Customer Support -->
+        <div class="footer-col-links">
+          <h4>Hỗ Trợ Khách Hàng</h4>
+          <ul>
+            <li><a onclick="showToast('Hỗ trợ mua hàng online: 1800 6601', 'info')">Hướng dẫn mua hàng online</a></li>
+            <li><a onclick="showToast('Chính sách giao hàng siêu tốc 2h miễn phí', 'info')">Chính sách giao nhận & Freeship</a></li>
+            <li><a onclick="showToast('Chính sách bảo hành 1 đổi 1 trong 12 tháng', 'info')">Chính sách bảo hành chính hãng</a></li>
+            <li><a onclick="showToast('Chính sách đổi trả trong vòng 30 ngày', 'info')">Chính sách đổi trả sản phẩm</a></li>
+            <li><a onclick="showToast('Chính sách bảo mật thông tin khách hàng', 'info')">Chính sách bảo mật dữ liệu</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: About Company -->
+        <div class="footer-col-links">
+          <h4>Về QD Mobile</h4>
+          <ul>
+            <li><a onclick="showToast('QD Mobile - Hệ thống bán lẻ uy tín', 'info')">Giới thiệu hệ thống cửa hàng</a></li>
+            <li><a onclick="showToast('Liên hệ hợp tác kinh doanh', 'info')">Liên hệ hợp tác & Góp ý</a></li>
+            <li><a onclick="showToast('Tuyển dụng nhân viên tư vấn bán hàng 2026', 'info')">Tuyển dụng nhân sự mới</a></li>
+            <li><a onclick="showToast('Điều khoản sử dụng dịch vụ mua bán', 'info')">Điều khoản mua bán & Dịch vụ</a></li>
+            <li><a onclick="showToast('Chương trình Thu cũ Đổi mới trợ giá 2tr', 'info')">Chương trình Thu cũ đổi mới</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Payment & Social Connection -->
+        <div class="footer-col-payment">
+          <h4>Thanh Toán & Kết Nối</h4>
+          <div class="payment-methods-logos" style="margin-bottom: 18px;">
+            <span class="payment-logo-tile" title="Visa"><i class="fa-brands fa-cc-visa"></i></span>
+            <span class="payment-logo-tile" title="Mastercard"><i class="fa-brands fa-cc-mastercard"></i></span>
+            <span class="payment-logo-tile" title="Apple Pay"><i class="fa-brands fa-apple-pay"></i></span>
+            <span class="payment-logo-tile" title="Chuyển khoản VietQR"><i class="fa-solid fa-qrcode"></i></span>
+          </div>
+          <span class="hotline-title" style="margin-bottom: 8px; display: block;">Kết nối với chúng tôi</span>
+          <div class="social-links-row">
+            <a class="social-icon-btn facebook" href="#" onclick="event.preventDefault(); showToast('Đang chuyển hướng tới Facebook...', 'info')" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a class="social-icon-btn youtube" href="#" onclick="event.preventDefault(); showToast('Đang chuyển hướng tới YouTube...', 'info')" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            <a class="social-icon-btn tiktok" href="#" onclick="event.preventDefault(); showToast('Đang chuyển hướng tới TikTok...', 'info')" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Footer Copyright Details -->
+      <div class="footer-bottom-bar">
+        <div class="bottom-bar-left">
+          <p>© 2026 Công ty Cổ phần Thương mại Bán lẻ QD Mobile Việt Nam. Bảo lưu mọi quyền.</p>
+          <p class="bottom-address-text">Địa chỉ văn phòng: Số 123 Đường Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Thành phố Hà Nội. GPĐKKD số: 0102345678 cấp bởi Sở KH&ĐT TP. Hà Nội.</p>
+        </div>
+        <div class="bottom-bar-right">
+          <span class="bo-cong-thuong-badge"><i class="fa-solid fa-shield-check"></i> Đã thông báo Bộ Công Thương</span>
+        </div>
+      </div>
     </div>
   </footer>
 
+  <!-- Custom Glassmorphism Confirm Modal -->
+  <div class="modal-overlay" id="custom-confirm-modal">
+    <div class="modal-content confirm-modal-content">
+      <div class="confirm-icon"><i class="fa-solid fa-circle-question"></i></div>
+      <h3 id="confirm-modal-title">Xác nhận</h3>
+      <p id="confirm-modal-message">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+      <div class="confirm-modal-actions">
+        <button class="btn btn-secondary" id="confirm-btn-cancel">Hủy bỏ</button>
+        <button class="btn btn-primary" id="confirm-btn-ok">Đồng ý</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js (3D Graphics Library) CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/app.js"></script>
 </body>
+
 </html>
